@@ -1,0 +1,2 @@
+this project is based from https://github.com/Binaryify/NeteaseCloudMusicApi aims to create a cli util to wrap it.
+using libcrypto++, libcurl.
