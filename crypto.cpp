@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <cmath>
 #include <iostream>
 #include <cryptopp/aes.h>
@@ -40,6 +41,30 @@ string createSecretKey(int size) {
 	return key;
 }
 
+static char base64Table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+string base64Encode(const string& text) {
+	std::vector<byte> textdata(text.begin(), text.end());
+	textdata.push_back(0);
+	unsigned data = 0;
+	int ignore = 2;
+	string result;
+	for (auto c : textdata) {
+		data <<= 8;
+		data |= (byte)c;
+		result.push_back(base64Table[data >> ignore]);
+		data &= (1 << ignore) - 1;
+		if (ignore == 6) {
+			result.push_back(base64Table[data]);
+			data = 0;
+			ignore = 0;
+		}
+		ignore += 2;
+	}
+	result.push_back('=');
+	result.push_back('=');
+	return result;
+}
 
 string aesEncrypt(const string& text, const string& secKey) {
 	string cipherText;
@@ -49,5 +74,9 @@ string aesEncrypt(const string& text, const string& secKey) {
 	CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(cipherText));
 	stfEncryptor.Put((const byte*)text.c_str(), text.length());
 	stfEncryptor.MessageEnd();
-	return hexEncode(cipherText);
+	return base64Encode(cipherText);
+}
+
+int main() {
+	std::cout << aesEncrypt("Hello World!", "EWpXau7TtbEE6vNY");
 }
