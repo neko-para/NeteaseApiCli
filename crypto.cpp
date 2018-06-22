@@ -5,6 +5,7 @@
 #include <cryptopp/aes.h>
 #include <cryptopp/filters.h>
 #include <cryptopp/modes.h>
+#include <gmp.h>
 using std::string;
 
 string modulus = "00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7";
@@ -44,26 +45,35 @@ string createSecretKey(int size) {
 static char base64Table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 string base64Encode(const string& text) {
-	std::vector<byte> textdata(text.begin(), text.end());
-	textdata.push_back(0);
-	unsigned data = 0;
-	int ignore = 2;
-	string result;
-	for (auto c : textdata) {
-		data <<= 8;
-		data |= (byte)c;
-		result.push_back(base64Table[data >> ignore]);
-		data &= (1 << ignore) - 1;
-		if (ignore == 6) {
-			result.push_back(base64Table[data]);
-			data = 0;
-			ignore = 0;
-		}
-		ignore += 2;
+	int len = text.length() / 3;
+	string rst;
+	unsigned data;
+	string::const_iterator pos = text.cbegin();
+	for (int i = 0; i < len; ++i) {
+		data = (byte)*pos++;
+		data = (data << 8) | (byte)*pos++;
+		data = (data << 8) | (byte)*pos++;
+		rst += base64Table[data >> 18];
+		rst += base64Table[(data >> 12) & 63];
+		rst += base64Table[(data >> 6) & 63];
+		rst += base64Table[data & 63];
 	}
-	result.push_back('=');
-	result.push_back('=');
-	return result;
+	switch (text.length() % 3) {
+		case 1:
+			rst += base64Table[(byte)*pos >> 2];
+			rst += base64Table[((byte)*pos << 4) & 63];
+			rst += "==";
+			break;
+		case 2:
+			data = (byte)*pos++;
+			data = (data << 8) | (byte)*pos++;
+			rst += base64Table[data >> 10];
+			rst += base64Table[(data >> 4) & 63];
+			rst += base64Table[(data << 2) & 63];
+			rst += "=";
+			break;
+	}
+	return rst;
 }
 
 string aesEncrypt(const string& text, const string& secKey) {
@@ -76,6 +86,14 @@ string aesEncrypt(const string& text, const string& secKey) {
 	stfEncryptor.MessageEnd();
 	return base64Encode(cipherText);
 }
+
+void zfill(string& str, size_t size) {
+	if (str.length() < size) {
+		str = string(size - str.length(), '0');
+	}
+}
+
+
 
 int main() {
 	std::cout << aesEncrypt("Hello World!", "EWpXau7TtbEE6vNY");
