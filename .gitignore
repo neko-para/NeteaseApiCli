@@ -1,1 +1,4 @@
 .vscode
+*.o
+libNeteaseApi.so
+NeteaseApi
