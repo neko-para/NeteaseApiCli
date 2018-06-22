@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 #include <cryptopp/aes.h>
 #include <cryptopp/filters.h>
 #include <cryptopp/modes.h>
@@ -87,14 +88,31 @@ string aesEncrypt(const string& text, const string& secKey) {
 	return base64Encode(cipherText);
 }
 
-void zfill(string& str, size_t size) {
+string zfill(const string& str, size_t size) {
 	if (str.length() < size) {
-		str = string(size - str.length(), '0');
+		return string(size - str.length(), '0') + str;
+	} else {
+		return str;
 	}
 }
 
+string rsaEncrypt(const string& text, const string& pubKey, const string& modulus) {
+	static char buffer[256 + 10];
+	string rtext = hexEncode(text);
+	std::reverse(rtext.begin(), rtext.end());
+	mpz_t bText, bEx, bMod, bRet;
+	mpz_init_set_str(bText, rtext.c_str(), 16);
+	mpz_init_set_str(bEx, pubKey.c_str(), 16);
+	mpz_init_set_str(bMod, modulus.c_str(), 16);
+	mpz_powm(bRet, bText, bEx, bMod);
+	gmp_sprintf(buffer, "%Zx", bRet);
+	auto ret = zfill(buffer, 256);
+	mpz_clears(bText, bEx, bMod, bRet, NULL);
+	return ret;
+}
 
-
-int main() {
-	std::cout << aesEncrypt("Hello World!", "EWpXau7TtbEE6vNY");
+void Encrypt(const string& text, string& encText, string& encSecKey) {
+	string secKey = createSecretKey(16);
+	encText = aesEncrypt(aesEncrypt(text, nonce), secKey);
+	encSecKey = rsaEncrypt(secKey, pubKey, modulus);
 }
