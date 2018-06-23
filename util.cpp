@@ -34,11 +34,19 @@ string randomUserAgent() {
 	return agents[rand() % (sizeof(agents) / sizeof(agents[0]))];
 }
 
-void appendData(void* ptr, size_t size, size_t nmemb, void* user) {
+size_t appendData(void* ptr, size_t size, size_t nmemb, void* user) {
 	std::vector<char>* p = (std::vector<char>*)user;
 	auto cs = p->size();
 	p->resize(cs + size * nmemb);
 	memcpy(p->data() + cs, ptr, size * nmemb);
+	return size * nmemb;
+}
+
+string ToStr(const rapidjson::Document& doc) {
+	rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    doc.Accept(writer);
+	return sb.GetString();
 }
 
 string createWebAPIRequest(const string& path, int method, rapidjson::Document& data, const string& cookie, string& retcookie) {
@@ -49,34 +57,29 @@ string createWebAPIRequest(const string& path, int method, rapidjson::Document& 
 	} else {
 		data.AddMember(rapidjson::Value("csrf_token"), rapidjson::Value(""), data.GetAllocator());
 	}
-	rapidjson::StringBuffer sb;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-    data.Accept(writer);
 	string encText, encKey;
-	Encrypt(sb.GetString(), encText, encKey);
+	Encrypt(ToStr(data), encText, encKey);
+	string body = "params=" + UrlEncode(encText) + "&encSecKey=" + UrlEncode(encKey);
 	std::vector<char> retdata;
 	CURL* curl = curl_easy_init();
 	curl_slist* header = 0;
-	// header = curl_slist_append(header, "Expect:");
-	header = curl_slist_append(header, "Accept:*/*");
-	header = curl_slist_append(header, "Accept-Language:zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4");
-	header = curl_slist_append(header, "Connection:keep-alive");
-	header = curl_slist_append(header, "Content-Type:application/x-www-form-urlencode");
-	header = curl_slist_append(header, "Referer:http://music.163.com");
-	header = curl_slist_append(header, "Host:music.163.com");
-	header = curl_slist_append(header, ("Cookie:" + cookie).c_str());
-	header = curl_slist_append(header, ("User-Agent:" + randomUserAgent()).c_str());
+	header = curl_slist_append(header, "Accept: */*");
+	header = curl_slist_append(header, "Accept-Language: zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4");
+	header = curl_slist_append(header, "Connection: keep-alive");
+	header = curl_slist_append(header, "Content-Type: application/x-www-form-urlencoded");
+	header = curl_slist_append(header, "Referer: http://music.163.com");
+	header = curl_slist_append(header, "Host: music.163.com");
+	header = curl_slist_append(header, ("Cookie: " + cookie).c_str());
+	header = curl_slist_append(header, ("User-Agent: " + randomUserAgent()).c_str());
 	curl_easy_setopt(curl, CURLOPT_POST, method);
 	curl_easy_setopt(curl, CURLOPT_URL, ("http://music.163.com" + path).c_str());
-	curl_easy_setopt(curl, CURLOPT_HEADER, 1);
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-	// curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, appendData);
-	// curl_easy_setopt(curl, CURLOPT_WRITEDATA, &retdata);
-	string body = "params=" + UrlEncode(encText) + "&encSecKey=" + UrlEncode(encKey);
-	std::cout << body << std::endl;
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, appendData);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &retdata);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, body.length());
 	curl_easy_perform(curl);
-	//curl_easy_getinfo(curl, CURLINFO_COOKIELIST, )
+    //curl_easy_getinfo(curl, CURLINFO_COOKIELIST, )
 	curl_slist_free_all(header);
 	curl_easy_cleanup(curl);
 	retdata.push_back(0);
