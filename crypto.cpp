@@ -1,5 +1,7 @@
 #include <cmath>
+#include <cctype>
 #include <algorithm>
+#include <iostream>
 #include <cryptopp/aes.h>
 #include <cryptopp/filters.h>
 #include <cryptopp/modes.h>
@@ -15,7 +17,7 @@ string trans(byte ch) {
 		if (i < 10) {
 			return i + '0';
 		} else {
-			return i - 10 + 'a';
+			return i - 10 + 'A';
 		}
 	};
 	char s[3] = { hex(ch >> 4), hex(ch & 0xF), 0 };
@@ -28,6 +30,21 @@ string hexEncode(const string& s) {
 		ret += trans(c);
 	}
 	return ret;
+}
+
+string UrlEncode(const string& text) {
+	string result;
+	for (auto ch : text) {
+		if (isalnum(ch) || ch == '.' || ch == '-' || ch == '_' || ch == '~') {
+			result += ch;
+		} else if (ch == ' ') {
+			result += '+';
+		} else {
+			result += '%';
+			result += trans(ch);
+		}
+	}
+	return result;
 }
 
 string createSecretKey(int size) {
@@ -95,15 +112,16 @@ string zfill(const string& str, size_t size) {
 
 string rsaEncrypt(const string& text, const string& pubKey, const string& modulus) {
 	static char buffer[256 + 10];
-	string rtext = hexEncode(text);
+	string rtext = text;
 	std::reverse(rtext.begin(), rtext.end());
 	mpz_t bText, bEx, bMod, bRet;
-	mpz_init_set_str(bText, rtext.c_str(), 16);
+	mpz_init_set_str(bText, hexEncode(rtext).c_str(), 16);
 	mpz_init_set_str(bEx, pubKey.c_str(), 16);
 	mpz_init_set_str(bMod, modulus.c_str(), 16);
+	mpz_init(bRet);
 	mpz_powm(bRet, bText, bEx, bMod);
 	gmp_sprintf(buffer, "%Zx", bRet);
-	auto ret = zfill(buffer, 256);
+	auto ret = zfill(buffer, 255);
 	mpz_clears(bText, bEx, bMod, bRet, NULL);
 	return ret;
 }

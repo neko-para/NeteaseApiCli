@@ -1,9 +1,10 @@
-#ifndef _NAC_CRYPTO_H_
-#define _NAC_CRYPTO_H_
+#ifndef __CRYPTO_H_
+#define __CRYPTO_H_
 
 #include <string>
 using std::string;
 
 void Encrypt(const string& text, string& encText, string& encSecKey);
+string UrlEncode(const string& text);
 
 #endif
