@@ -78,8 +78,14 @@ string createWebAPIRequest(const string& path, int method, rapidjson::Document& 
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &retdata);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, body.length());
+	curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
 	curl_easy_perform(curl);
-    //curl_easy_getinfo(curl, CURLINFO_COOKIELIST, )
+	curl_slist* cookieList;
+    curl_easy_getinfo(curl, CURLINFO_COOKIELIST, &cookieList);
+	for (auto p = cookieList; p; p = p->next) {
+		std::cerr << p->data << std::endl; // TODO: return cookie
+	}
+	curl_slist_free_all(cookieList);
 	curl_slist_free_all(header);
 	curl_easy_cleanup(curl);
 	retdata.push_back(0);
