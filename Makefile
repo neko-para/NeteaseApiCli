@@ -1,6 +1,18 @@
 EXFLAG=-g -Wall -Wextra
+PREFIX=/usr/local
 
 all: NeteaseApi
+
+clean:
+	-rm -f *.o NeteaseApi libNeteaseApi.so
+
+install: all
+	mkdir -p $(PREFIX)/bin
+	mkdir -p $(PREFIX)/include
+	mkdir -p $(PREFIX)/lib
+	install -m 755 NeteaseApi $(PREFIX)/bin/NeteaseApi
+	install -m 644 NeteaseApi.h $(PREFIX)/include/NeteaseApi.h
+	install -m 644 libNeteaseApi.so $(PREFIX)/lib/libNeteaseApi.so
 
 NeteaseApi: main.cpp NeteaseApi.h libNeteaseApi.so
 	g++ $(EXFLAG) -o $@ main.cpp -L. -Wl,--rpath=. -lNeteaseApi
