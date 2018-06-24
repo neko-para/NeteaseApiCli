@@ -15,11 +15,13 @@ namespace netease {
 	enum SearchType {
 		ST_SONG = 1,
 		ST_ALBUM = 10,
-		ST_SINGER = 100,
+		ST_ARTIST = 100,
 		ST_PLAYLIST = 1000,
 		ST_USER = 1002
 	};
 
+	string album(int id);
+	string artist(int id);
 	string search(const string& keyword, SearchType type, int limit = 30, int offset = 0);
 
 }

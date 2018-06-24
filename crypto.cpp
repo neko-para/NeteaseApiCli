@@ -2,9 +2,9 @@
 #include <cctype>
 #include <algorithm>
 #include <iostream>
-#include <cryptopp/aes.h>
-#include <cryptopp/filters.h>
-#include <cryptopp/modes.h>
+#include <crypto++/aes.h>
+#include <crypto++/filters.h>
+#include <crypto++/modes.h>
 #include <gmp.h>
 #include "crypto.h"
 

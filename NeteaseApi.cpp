@@ -42,13 +42,37 @@ namespace netease {
 		doc.AddMember(rapidjson::Value(key, doc.GetAllocator()), rapidjson::Value(s, doc.GetAllocator()), doc.GetAllocator());
 	}
 
+	inline void add(rapidjson::Document& doc, const char* key, const string& s) {
+		add(doc, key, s.c_str());
+	}
+
+	template <typename Type>
+	inline void build(rapidjson::Document& doc, const char* key, const Type& value) {
+		add(doc, key, value);
+	}
+
+	template <typename Type, typename... Arg>
+	inline void build(rapidjson::Document& doc, const char* key, const Type& value, const Arg&... arg) {
+		add(doc, key, value);
+		build(doc, arg...);
+	}
+
+	string album(int id) {
+		rapidjson::Document data;
+		data.SetObject();
+		return createWebAPIRequest("/weapi/v1/album/" + tostr(id), POST, data, cookie, cookie);
+	}
+
+	string artist(int id) {
+		rapidjson::Document data;
+		data.SetObject();
+		return createWebAPIRequest("/weapi/v1/artist/" + tostr(id), POST, data, cookie, cookie);
+	}
+
 	string search(const string& keyword, SearchType type, int limit, int offset) {
 		rapidjson::Document data;
 		data.SetObject();
-		add(data, "type", type);
-		add(data, "limit", limit);
-		add(data, "offset", offset);
-		add(data, "s", keyword.c_str());
+		build(data, "type", type, "limit", limit, "offset", offset, "s", keyword);
 		return createWebAPIRequest("/weapi/search/get", POST, data, cookie, cookie);
 	}
 
