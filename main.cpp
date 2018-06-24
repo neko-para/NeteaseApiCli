@@ -9,6 +9,7 @@ usage:
 	~ help
 	~ album id(%d)
 	~ artist id(%d)
+	~ music.url id(%d) [bitrate(%d)=999000]
 	~ search text [type(song, album, artist, playlist, user)=song [limit(%d)=30 [offset(%d)=0]]]
 	~ song.detail id(%d)
 	~ user.detail id(%d)
@@ -33,6 +34,12 @@ int main(int argc, char* argv[]) {
 			std::cout << netease::album(atoi(arg(2)));
 		} else if (paramis(1, artist)) {
 			std::cout << netease::artist(atoi(arg(2)));
+		} else if (paramis(1, music.url)) {
+			int bitrate = 999000;
+			try {
+				bitrate = atoi(arg(3));
+			} catch (...) {}
+			std::cout << netease::music_url(atoi(arg(2)), bitrate);
 		} else if (paramis(1, search)) {
 			netease::SearchType st = netease::ST_SONG;
 			int limit = 30, offset = 0;
