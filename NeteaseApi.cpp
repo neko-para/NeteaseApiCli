@@ -76,4 +76,24 @@ namespace netease {
 		return createWebAPIRequest("/weapi/search/get", POST, data, cookie, cookie);
 	}
 
+	string song_detail(int id) {
+		rapidjson::Document data;
+		data.SetObject();
+		build(data, "c", R"([{"id":)" + tostr(id) + "}]", "ids", "[" + tostr(id) + "]");
+		return createWebAPIRequest("/weapi/v3/song/detail", POST, data, cookie, cookie);
+	}
+
+	string user_detail(int id) {
+		rapidjson::Document data;
+		data.SetObject();
+		return createWebAPIRequest("/weapi/v1/user/detail/" + tostr(id), POST, data, cookie, cookie);
+	}
+
+	string user_playlist(int id, int limit, int offset) {
+		rapidjson::Document data;
+		data.SetObject();
+		build(data, "limit", limit, "offset", offset, "uid", id);
+		return createWebAPIRequest("/weapi/user/playlist", POST, data, cookie, cookie);
+	}
+
 }
