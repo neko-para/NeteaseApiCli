@@ -1,37 +1,26 @@
 #include "NeteaseApi.h"
-#include "util.h"
 #include "crypto.h"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <curl/curl.h>
 #include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 namespace netease {
-
-	static string cookie;
-
-	void init() {
-		curl_global_init(CURL_GLOBAL_ALL);
-		srand(time(0));
-	}
-
-	void exit() {
-		curl_global_cleanup();
-	}
-
-	void setcookie(const string& c) {
-		cookie = c;
-	}
-
-	string getcookie() {
-		return cookie;
-	}
 
 	inline string tostr(int i) {
 		char temp[12];
 		sprintf(temp, "%d", i);
 		return temp;
+	}
+
+	string tostr(const rapidjson::Document& doc) {
+		rapidjson::StringBuffer sb;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+		doc.Accept(writer);
+		return sb.GetString();
 	}
 
 	inline void add(rapidjson::Document& doc, const char* key, int i) {
@@ -57,50 +46,57 @@ namespace netease {
 		build(doc, arg...);
 	}
 
-	string album(int id) {
-		rapidjson::Document data;
-		data.SetObject();
-		return createWebAPIRequest("/weapi/v1/album/" + tostr(id), POST, data, cookie, cookie);
+	static string build_post(rapidjson::Document& doc) {
+		add(doc, "csrf_token", "");
+		string encText, encKey;
+		Encrypt(tostr(doc), encText, encKey);
+		return "params=" + UrlEncode(encText) + "&encSecKey=" + UrlEncode(encKey);
 	}
 
-	string artist(int id) {
+	Action album(int id) {
 		rapidjson::Document data;
 		data.SetObject();
-		return createWebAPIRequest("/weapi/v1/artist/" + tostr(id), POST, data, cookie, cookie);
+		return Action("/v1/album/" + tostr(id), build_post(data));
 	}
 
-	string music_url(int id, int bitrate) {
+	Action artist(int id) {
+		rapidjson::Document data;
+		data.SetObject();
+		return Action("/v1/artist/" + tostr(id), build_post(data));
+	}
+
+	Action music_url(int id, int bitrate) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "ids", "[" + tostr(id) + "]", "br", bitrate);
-		return createWebAPIRequest("/weapi/song/enhance/player/url", POST, data, cookie, cookie);
+		return Action("/song/enhance/player/url", build_post(data));
 	}
 
-	string search(const string& keyword, SearchType type, int limit, int offset) {
+	Action search(const string& keyword, SearchType type, int limit, int offset) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "type", type, "limit", limit, "offset", offset, "s", keyword);
-		return createWebAPIRequest("/weapi/search/get", POST, data, cookie, cookie);
+		return Action("/search/get", build_post(data));
 	}
 
-	string song_detail(int id) {
+	Action song_detail(int id) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "c", R"([{"id":)" + tostr(id) + "}]", "ids", "[" + tostr(id) + "]");
-		return createWebAPIRequest("/weapi/v3/song/detail", POST, data, cookie, cookie);
+		return Action("/v3/song/detail", build_post(data));
 	}
 
-	string user_detail(int id) {
+	Action user_detail(int id) {
 		rapidjson::Document data;
 		data.SetObject();
-		return createWebAPIRequest("/weapi/v1/user/detail/" + tostr(id), POST, data, cookie, cookie);
+		return Action("v1/user/detail/" + tostr(id), build_post(data));
 	}
 
-	string user_playlist(int id, int limit, int offset) {
+	Action user_playlist(int id, int limit, int offset) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "limit", limit, "offset", offset, "uid", id);
-		return createWebAPIRequest("/weapi/user/playlist", POST, data, cookie, cookie);
+		return Action("/user/playlist", build_post(data));
 	}
 
 }
