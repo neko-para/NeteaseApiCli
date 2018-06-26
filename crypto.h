@@ -5,6 +5,7 @@
 using std::string;
 
 void Encrypt(const string& text, string& encText, string& encSecKey);
+string Md5Encode(const string& text);
 string UrlEncode(const string& text);
 
 #endif

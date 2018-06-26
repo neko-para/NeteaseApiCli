@@ -65,6 +65,15 @@ namespace netease {
 		return Action("/v1/artist/" + tostr(id), build_post(data));
 	}
 
+	Action login_cellphone(long long phone, const string& pswd) {
+		rapidjson::Document data;
+		data.SetObject();
+		char buffer[22];
+		sprintf(buffer, "%lld", phone);
+		build(data, "phone", buffer, "password", Md5Encode(pswd), "rememberLogin", "true");
+		return Action("/login/cellphone", build_post(data));
+	}
+
 	Action music_url(int id, int bitrate) {
 		rapidjson::Document data;
 		data.SetObject();

@@ -5,6 +5,8 @@
 #include <crypto++/aes.h>
 #include <crypto++/filters.h>
 #include <crypto++/modes.h>
+#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
+#include <crypto++/md5.h>
 #include <gmp.h>
 #include "crypto.h"
 
@@ -17,7 +19,7 @@ string trans(byte ch) {
 		if (i < 10) {
 			return i + '0';
 		} else {
-			return i - 10 + 'A';
+			return i - 10 + 'a';
 		}
 	};
 	char s[3] = { hex(ch >> 4), hex(ch & 0xF), 0 };
@@ -45,6 +47,15 @@ string UrlEncode(const string& text) {
 		}
 	}
 	return result;
+}
+
+string Md5Encode(const string& text) {
+	char ret[17];
+	CryptoPP::Weak::MD5 md5;
+	md5.Update((const byte*)text.c_str(), text.length());
+	md5.Final((byte*)ret);
+	ret[16] = 0;
+	return hexEncode(ret);
 }
 
 string createSecretKey(int size) {
