@@ -9,11 +9,14 @@
 bool raw = false;
 string icookie = "/tmp/neteaseapicookie", ocookie = "/tmp/neteaseapicookie";
 
+const char* version = "NeteaseApiCli 1.0.0 libNeteaseApi " NETEASEAPI_VERSION;
+
 const char* help = 
 R"(NeteaseApi poption] command params...
-option:
+regular option:
 	-r              print url and post data directly
-	-h              print header
+	-h              generate a header
+	-v              print version
 cookie option:
 	Note: default cookie file is /tmp/neteaseapicookie
 	-a cookie-file  specify cookie file for both reading and writing
@@ -113,6 +116,9 @@ int main(int argc, char* argv[]) {
 					raw = true;
 					deal += 1;
 					break;
+				case 'v':
+					std::cout << version << std::endl;
+					return 0;
 				case 'h':
 					for (const auto& s : netease::headers) {
 						std::cout << s << '\n';

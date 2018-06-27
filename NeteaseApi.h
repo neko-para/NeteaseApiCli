@@ -4,6 +4,8 @@
 #include <string>
 using std::string;
 
+#define NETEASEAPI_VERSION "1.0.0"
+
 namespace netease {
 
 	const string headers[] = {

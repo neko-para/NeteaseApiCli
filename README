@@ -1,3 +1,0 @@
-Project bases on https://github.com/Binaryify/NeteaseCloudMusicApi.
-Aim to create a cli util.
-Using libcrypto++, libcurl, librapidjson.
