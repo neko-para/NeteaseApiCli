@@ -47,7 +47,6 @@ namespace netease {
 	}
 
 	static string build_post(rapidjson::Document& doc) {
-		add(doc, "csrf_token", "");
 		string encText, encKey;
 		Encrypt(tostr(doc), encText, encKey);
 		return "params=" + UrlEncode(encText) + "&encSecKey=" + UrlEncode(encKey);
@@ -79,6 +78,12 @@ namespace netease {
 		data.SetObject();
 		build(data, "ids", "[" + tostr(id) + "]", "br", bitrate);
 		return Action("/song/enhance/player/url", build_post(data));
+	}
+
+	Action personal_fm() {
+		rapidjson::Document data;
+		data.SetObject();
+		return Action("/v1/radio/get", build_post(data));
 	}
 
 	Action search(const string& keyword, SearchType type, int limit, int offset) {

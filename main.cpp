@@ -7,21 +7,27 @@
 #include <vector>
 
 bool raw = false;
-string icookie = "/dev/null", ocookie = "/dev/null";
+string icookie = "/tmp/neteaseapicookie", ocookie = "/tmp/neteaseapicookie";
 
 const char* help = 
-R"(NeteaseApi poption] cmd params...
+R"(NeteaseApi poption] command params...
 option:
-	-r                 print url and post data directly
-	-h                 print header
-	-b cookie-file     specify cookie file for reading
-	-c cookie-file     specify cookie file for writing
-usage:
+	-r              print url and post data directly
+	-h              print header
+cookie option:
+	Note: default cookie file is /tmp/neteaseapicookie
+	-a cookie-file  specify cookie file for both reading and writing
+	-b cookie-file  specify cookie file for reading
+	-c cookie-file  specify cookie file for writing
+
+command:
+	Note: command with @ means this method need login.
 	~ help
 	~ album id(%d)
 	~ artist id(%d)
 	~ music.url id(%d) [bitrate(%d)=999000]
 	~ login.cellphone phone(%d) <password
+	@ personal.fm
 	~ search text [type(song, album, artist, playlist, user)=song [limit(%d)=30 [offset(%d)=0]]]
 	~ song.detail id(%d)
 	~ user.detail id(%d)
@@ -91,6 +97,10 @@ int main(int argc, char* argv[]) {
 			auto p = arg(1);
 			if (p[0] == '-') {
 				switch (p[1]) {
+				case 'a':
+					icookie = ocookie = arg(2);
+					deal += 2;
+					break;
 				case 'b':
 					icookie = arg(2);
 					deal += 2;
@@ -123,16 +133,18 @@ int main(int argc, char* argv[]) {
 			std::cout << print(netease::album(atoi(arg(2))));
 		} else if (paramis(1, artist)) {
 			std::cout << print(netease::artist(atoi(arg(2))));
+		} else if (paramis(1, login.cellphone)) {
+			string pswd;
+			std::getline(std::cin, pswd);
+			std::cout << print(netease::login_cellphone(atoll(arg(2)), pswd));
 		} else if (paramis(1, music.url)) {
 			int bitrate = 999000;
 			try {
 				bitrate = atoi(arg(3));
 			} catch (...) {}
 			std::cout << print(netease::music_url(atoi(arg(2)), bitrate));
-		} else if (paramis(1, login.cellphone)) {
-			string pswd;
-			std::getline(std::cin, pswd);
-			std::cout << print(netease::login_cellphone(atoll(arg(2)), pswd));
+		} else if (paramis(1, personal.fm)) {
+			std::cout << print(netease::personal_fm());
 		} else if (paramis(1, search)) {
 			netease::SearchType st = netease::ST_SONG;
 			int limit = 30, offset = 0;

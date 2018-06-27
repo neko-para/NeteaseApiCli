@@ -58,8 +58,9 @@ namespace netease {
 
 	Action album(int id);
 	Action artist(int id);
-	Action music_url(int id, int bitrate = 999000);
 	Action login_cellphone(long long phone, const string& pswd);
+	Action music_url(int id, int bitrate = 999000);
+	Action personal_fm();
 	Action search(const string& keyword, SearchType type, int limit = 30, int offset = 0);
 	Action song_detail(int id);
 	Action user_detail(int id);
