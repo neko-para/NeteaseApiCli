@@ -60,6 +60,8 @@ namespace netease {
 
 	Action album(long long id);
 	Action artist(long long id);
+	Action artist_albums(long long id, int limit = 30, int offset = 0);
+	Action artist_introduction(long long id);
 	Action login_cellphone(long long phone, const string& pswd);
 	Action music_url(long long id, int bitrate = 999000);
 	Action personal_fm();

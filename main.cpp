@@ -28,15 +28,17 @@ cookie option:
 command:
 	Note: command with @ means this method need login.
 	~ help
-	~ album id(%d)
-	~ artist id(%d)
-	~ music.url id(%d) [bitrate(%d)=999000]
-	~ login.cellphone phone(%d) <password
+	~ album id(%lld)
+	~ artist id(%lld)
+	~ artist.albums id(%lld) [limit(%d)=30 [offset(%d)=0]]
+	~ artist.introduction id(%lld)
+	~ music.url id(%lld) [bitrate(%d)=999000]
+	~ login.cellphone phone(%lld) <password
 	@ personal.fm
 	~ search text [type(song, album, artist, playlist, user)=song [limit(%d)=30 [offset(%d)=0]]]
-	~ song.detail id(%d)
-	~ user.detail id(%d)
-	~ user.playlist id(%d) [limit(%d)=30 [offset(%d)=0]]
+	~ song.detail id(%lld)
+	~ user.detail id(%lld)
+	~ user.playlist id(%lld) [limit(%d)=30 [offset(%d)=0]]
 )";
 
 #define paramis(id, text) !strcmp(arg(id), #text)
@@ -156,10 +158,21 @@ int main(int argc, char* argv[]) {
 			std::cout << help;
 		},
 		"album", [&]() {
-			std::cout << print(netease::album(atoi(arg(2))));
+			std::cout << print(netease::album(atoll(arg(2))));
 		},
 		"artist", [&]() {
-			std::cout << print(netease::artist(atoi(arg(2))));
+			std::cout << print(netease::artist(atoll(arg(2))));
+		},
+		"artist.albums", [&]() {
+			int limit = 30, offset = 0;
+			try {
+				limit = atoi(arg(3));
+				offset = atoi(arg(4));
+			} catch (...) {}
+			std::cout << print(netease::artist_albums(atoll(arg(2)), limit, offset));
+		},
+		"artist.introduction", [&]() {
+			std::cout << print(netease::artist_introduction(atoll(arg(2))));
 		},
 		"login.cellphone", [&]() {
 			string pswd;
@@ -173,7 +186,7 @@ int main(int argc, char* argv[]) {
 			try {
 				bitrate = atoi(arg(3));
 			} catch (...) {}
-			std::cout << print(netease::music_url(atoi(arg(2)), bitrate));
+			std::cout << print(netease::music_url(atoll(arg(2)), bitrate));
 		},
 		"personal.fm", [&]() {
 			std::cout << print(netease::personal_fm());
@@ -199,10 +212,10 @@ int main(int argc, char* argv[]) {
 			std::cout << print(netease::search(arg(2), st, limit, offset));
 		},
 		"song.detail", [&]() {
-			std::cout << print(netease::song_detail(atoi(arg(2))));
+			std::cout << print(netease::song_detail(atoll(arg(2))));
 		},
 		"user.detail", [&]() {
-			std::cout << print(netease::user_detail(atoi(arg(2))));
+			std::cout << print(netease::user_detail(atoll(arg(2))));
 		},
 		"user.playlist", [&]() {
 			int limit = 30, offset = 0;
@@ -210,7 +223,7 @@ int main(int argc, char* argv[]) {
 				limit = atoi(arg(3));
 				offset = atoi(arg(4));
 			} catch (...) {}
-			std::cout << print(netease::user_playlist(atoi(arg(2)), limit, offset));
+			std::cout << print(netease::user_playlist(atoll(arg(2)), limit, offset));
 		}
 	};
 	try {

@@ -27,12 +27,20 @@ namespace netease {
 		return sb.GetString();
 	}
 
+	inline void add(rapidjson::Document& doc, const char* key, long long i) {
+		doc.AddMember(rapidjson::Value(key, doc.GetAllocator()), rapidjson::Value((int64_t)i), doc.GetAllocator());
+	}
+
 	inline void add(rapidjson::Document& doc, const char* key, int i) {
-		doc.AddMember(rapidjson::Value(key, doc.GetAllocator()), rapidjson::Value(tostr(i).c_str(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(rapidjson::Value(key, doc.GetAllocator()), rapidjson::Value(i), doc.GetAllocator());
 	}
 
 	inline void add(rapidjson::Document& doc, const char* key, const char* s) {
 		doc.AddMember(rapidjson::Value(key, doc.GetAllocator()), rapidjson::Value(s, doc.GetAllocator()), doc.GetAllocator());
+	}
+
+	inline void add(rapidjson::Document& doc, const char* key, bool b) {
+		doc.AddMember(rapidjson::Value(key, doc.GetAllocator()), rapidjson::Value(b), doc.GetAllocator());
 	}
 
 	inline void add(rapidjson::Document& doc, const char* key, const string& s) {
@@ -66,6 +74,20 @@ namespace netease {
 		rapidjson::Document data;
 		data.SetObject();
 		return Action("/v1/artist/" + tostr(id), build_post(data));
+	}
+
+	Action artist_albums(long long id, int limit, int offset) {
+		rapidjson::Document data;
+		data.SetObject();
+		build(data, "offset", offset, "limit", limit, "total", true);
+		return Action("/artist/albums/" + tostr(id), build_post(data));
+	}
+
+	Action artist_introduction(long long id) {
+		rapidjson::Document data;
+		data.SetObject();
+		build(data, "id", id);
+		return Action("/artist/introduction", build_post(data));
 	}
 
 	Action login_cellphone(long long phone, const string& pswd) {
