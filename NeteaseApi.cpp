@@ -10,9 +10,13 @@
 
 namespace netease {
 
-	inline string tostr(int i) {
-		char temp[12];
-		sprintf(temp, "%d", i);
+	inline string tostr(long long i) {
+		char temp[22];
+#ifdef WIN32
+		sprintf(temp, "%I64d", i);
+#else
+		sprintf(temp, "%lld", i);
+#endif
 		return temp;
 	}
 
@@ -52,13 +56,13 @@ namespace netease {
 		return "params=" + UrlEncode(encText) + "&encSecKey=" + UrlEncode(encKey);
 	}
 
-	Action album(int id) {
+	Action album(long long id) {
 		rapidjson::Document data;
 		data.SetObject();
 		return Action("/v1/album/" + tostr(id), build_post(data));
 	}
 
-	Action artist(int id) {
+	Action artist(long long id) {
 		rapidjson::Document data;
 		data.SetObject();
 		return Action("/v1/artist/" + tostr(id), build_post(data));
@@ -73,7 +77,7 @@ namespace netease {
 		return Action("/login/cellphone", build_post(data));
 	}
 
-	Action music_url(int id, int bitrate) {
+	Action music_url(long long id, int bitrate) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "ids", "[" + tostr(id) + "]", "br", bitrate);
@@ -93,20 +97,20 @@ namespace netease {
 		return Action("/search/get", build_post(data));
 	}
 
-	Action song_detail(int id) {
+	Action song_detail(long long id) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "c", R"([{"id":)" + tostr(id) + "}]", "ids", "[" + tostr(id) + "]");
 		return Action("/v3/song/detail", build_post(data));
 	}
 
-	Action user_detail(int id) {
+	Action user_detail(long long id) {
 		rapidjson::Document data;
 		data.SetObject();
 		return Action("v1/user/detail/" + tostr(id), build_post(data));
 	}
 
-	Action user_playlist(int id, int limit, int offset) {
+	Action user_playlist(long long id, int limit, int offset) {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "limit", limit, "offset", offset, "uid", id);

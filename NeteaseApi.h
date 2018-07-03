@@ -58,15 +58,15 @@ namespace netease {
 		ST_USER = 1002
 	};
 
-	Action album(int id);
-	Action artist(int id);
+	Action album(long long id);
+	Action artist(long long id);
 	Action login_cellphone(long long phone, const string& pswd);
-	Action music_url(int id, int bitrate = 999000);
+	Action music_url(long long id, int bitrate = 999000);
 	Action personal_fm();
 	Action search(const string& keyword, SearchType type, int limit = 30, int offset = 0);
-	Action song_detail(int id);
-	Action user_detail(int id);
-	Action user_playlist(int id, int limit = 30, int offset = 0);
+	Action song_detail(long long id);
+	Action user_detail(long long id);
+	Action user_playlist(long long id, int limit = 30, int offset = 0);
 
 }
 

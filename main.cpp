@@ -5,8 +5,9 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <termios.h>
 
-bool raw = false;
+bool rawprint = false;
 string icookie = "/tmp/neteaseapicookie", ocookie = "/tmp/neteaseapicookie";
 
 const char* version = "NeteaseApiCli 1.0.0 libNeteaseApi " NETEASEAPI_VERSION;
@@ -78,11 +79,25 @@ string download(const Action& action) {
 }
 
 string print(const Action& a) {
-	if (raw) {
+	if (rawprint) {
 		return a.url + "\n" + a.post + "\n";
 	} else {
 		return download(a);
 	}
+}
+
+void close_echo() {
+	struct termios opt;
+	tcgetattr(fileno(stdin), &opt);
+	opt.c_lflag &= ~ECHO;
+	tcsetattr(fileno(stdin), TCSAFLUSH, &opt);
+}
+
+void open_echo() {
+	struct termios opt;
+	tcgetattr(fileno(stdin), &opt);
+	opt.c_lflag |= ECHO;
+	tcsetattr(fileno(stdin), TCSANOW, &opt);
 }
 
 int main(int argc, char* argv[]) {
@@ -113,7 +128,7 @@ int main(int argc, char* argv[]) {
 					deal += 2;
 					break;
 				case 'r':
-					raw = true;
+					rawprint = true;
 					deal += 1;
 					break;
 				case 'v':
@@ -141,7 +156,9 @@ int main(int argc, char* argv[]) {
 			std::cout << print(netease::artist(atoi(arg(2))));
 		} else if (paramis(1, login.cellphone)) {
 			string pswd;
+			close_echo();
 			std::getline(std::cin, pswd);
+			open_echo();
 			std::cout << print(netease::login_cellphone(atoll(arg(2)), pswd));
 		} else if (paramis(1, music.url)) {
 			int bitrate = 999000;
