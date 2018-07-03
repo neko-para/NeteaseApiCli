@@ -1,5 +1,6 @@
 #include "NeteaseApi.h"
 #include <curl/curl.h>
+#include <functional>
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
@@ -147,28 +148,37 @@ int main(int argc, char* argv[]) {
 		}
 	} catch (...) {}
 	curl_global_init(CURL_GLOBAL_ALL);
-	try {
-		if (paramis(1, help)) {
+	struct {
+		const char* cmd;
+		std::function<void(void)> fun;
+	} route[] = {
+		"help", []() {
 			std::cout << help;
-		} else if (paramis(1, album)) {
+		},
+		"album", [&]() {
 			std::cout << print(netease::album(atoi(arg(2))));
-		} else if (paramis(1, artist)) {
+		},
+		"artist", [&]() {
 			std::cout << print(netease::artist(atoi(arg(2))));
-		} else if (paramis(1, login.cellphone)) {
+		},
+		"login.cellphone", [&]() {
 			string pswd;
 			close_echo();
 			std::getline(std::cin, pswd);
 			open_echo();
 			std::cout << print(netease::login_cellphone(atoll(arg(2)), pswd));
-		} else if (paramis(1, music.url)) {
+		},
+		"music.url", [&]() {
 			int bitrate = 999000;
 			try {
 				bitrate = atoi(arg(3));
 			} catch (...) {}
 			std::cout << print(netease::music_url(atoi(arg(2)), bitrate));
-		} else if (paramis(1, personal.fm)) {
+		},
+		"personal.fm", [&]() {
 			std::cout << print(netease::personal_fm());
-		} else if (paramis(1, search)) {
+		},
+		"search", [&]() {
 			netease::SearchType st = netease::ST_SONG;
 			int limit = 30, offset = 0;
 			try {
@@ -187,17 +197,34 @@ int main(int argc, char* argv[]) {
 				offset = atoi(arg(5));
 			} catch (...) {}
 			std::cout << print(netease::search(arg(2), st, limit, offset));
-		} else if (paramis(1, song.detail)) {
+		},
+		"song.detail", [&]() {
 			std::cout << print(netease::song_detail(atoi(arg(2))));
-		} else if (paramis(1, user.detail)) {
+		},
+		"user.detail", [&]() {
 			std::cout << print(netease::user_detail(atoi(arg(2))));
-		} else if (paramis(1, user.playlist)) {
+		},
+		"user.playlist", [&]() {
 			int limit = 30, offset = 0;
 			try {
 				limit = atoi(arg(3));
 				offset = atoi(arg(4));
 			} catch (...) {}
 			std::cout << print(netease::user_playlist(atoi(arg(2)), limit, offset));
+		}
+	};
+	try {
+		const char* cmd = arg(1);
+		bool found = false;
+		for (const auto& p : route) {
+			if (!strcmp(p.cmd, cmd)) {
+				p.fun();
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			throw "";
 		}
 	} catch (...) {
 		std::cout << help;
