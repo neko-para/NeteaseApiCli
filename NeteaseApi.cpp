@@ -112,6 +112,14 @@ namespace netease {
 		return Action("/v1/radio/get", build_post(data));
 	}
 
+	Action dailytask(DailyTaskType type) {
+		rapidjson::Document data;
+		data.SetObject();
+		build(data, "type", type);
+		return Action("/v1/point/dailyTask", build_post(data));
+
+	}
+
 	Action search(const string& keyword, SearchType type, int limit, int offset) {
 		rapidjson::Document data;
 		data.SetObject();

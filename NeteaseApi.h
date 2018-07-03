@@ -58,6 +58,11 @@ namespace netease {
 		ST_USER = 1002
 	};
 
+	enum DailyTaskType {
+		DTT_ANDROID = 0,
+		DTT_WEB = 1
+	};
+
 	Action album(long long id);
 	Action artist(long long id);
 	Action artist_albums(long long id, int limit = 30, int offset = 0);
@@ -65,6 +70,7 @@ namespace netease {
 	Action login_cellphone(long long phone, const string& pswd);
 	Action music_url(long long id, int bitrate = 999000);
 	Action personal_fm();
+	Action dailytask(DailyTaskType type = DTT_WEB);
 	Action search(const string& keyword, SearchType type, int limit = 30, int offset = 0);
 	Action song_detail(long long id);
 	Action user_detail(long long id);
