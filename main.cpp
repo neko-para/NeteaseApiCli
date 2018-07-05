@@ -32,10 +32,10 @@ command:
 	~ artist id(%lld)
 	~ artist.albums id(%lld) [limit(%d)=30 [offset(%d)=0]]
 	~ artist.introduction id(%lld)
-	~ music.url id(%lld) [bitrate(%d)=999000]
-	~ login.cellphone phone(%lld) <password
-	@ personal.fm
 	@ dailytask [type(android, web)=android]
+	~ login.cellphone phone(%lld) <password
+	~ music.url id(%lld) [bitrate(%d)=999000]
+	@ personal.fm
 	~ search text [type(song, album, artist, playlist, user)=song [limit(%d)=30 [offset(%d)=0]]]
 	~ song.detail id(%lld)
 	~ user.detail id(%lld)
@@ -175,6 +175,17 @@ int main(int argc, char* argv[]) {
 		"artist.introduction", [&]() {
 			std::cout << print(netease::artist_introduction(atoll(arg(2))));
 		},
+		"dailytask", [&]() {
+			netease::DailyTaskType dtt = netease::DTT_WEB;
+			try {
+				if (paramis(3, andriod)) {
+					dtt = netease::DTT_ANDROID;
+				} else if (paramis(3, web)) {
+					dtt = netease::DTT_WEB;
+				}
+			} catch (...) {}
+			std::cout << print(netease::dailytask(dtt));
+		},
 		"login.cellphone", [&]() {
 			string pswd;
 			close_echo();
@@ -191,15 +202,6 @@ int main(int argc, char* argv[]) {
 		},
 		"personal.fm", [&]() {
 			std::cout << print(netease::personal_fm());
-		},
-		"dailytask", [&]() {
-			netease::DailyTaskType dtt = netease::DTT_WEB;
-			if (paramis(3, andriod)) {
-				dtt = netease::DTT_ANDROID;
-			} else if (paramis(3, web)) {
-				dtt = netease::DTT_WEB;
-			}
-			std::cout << print(netease::dailytask(dtt));
 		},
 		"search", [&]() {
 			netease::SearchType st = netease::ST_SONG;
