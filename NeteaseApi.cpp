@@ -116,8 +116,7 @@ namespace netease {
 		rapidjson::Document data;
 		data.SetObject();
 		build(data, "type", type);
-		return Action("/v1/point/dailyTask", build_post(data));
-
+		return Action("/point/dailyTask", build_post(data));
 	}
 
 	Action search(const string& keyword, SearchType type, int limit, int offset) {
