@@ -8,18 +8,27 @@ using std::string;
 
 namespace netease {
 
-	const string headers[] = {
-		"Accept: */*",
-		"Accept-Language: zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4",
-		"Connection: keep-alive",
-		"Content-Type: application/x-www-form-urlencoded",
-		"Referer: http://music.163.com",
-		"Host: music.163.com"
-		// "Cookie: ..."
-		// "User-Agent: ..."
+	const char* const headerKeys[] = {
+		"Accept",
+		"Accpet-Language",
+		"Connection",
+		"Content-Type",
+		"Referer",
+		"Host"
 	};
 
-	const string agents[] = {
+	const char* const headerValues[] = {
+		"*/*",
+		"zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4",
+		"keep-alive",
+		"application/x-www-form-urlencoded",
+		"http://music.163.com",
+		"music.163.com"
+	};
+
+	const int headers_count = sizeof(headerKeys) / sizeof(headerKeys[0]);
+
+	const char* const agents[] = {
 		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
 		"Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1",
 		"Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1",

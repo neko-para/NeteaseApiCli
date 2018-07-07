@@ -62,8 +62,8 @@ string download(const Action& action) {
 	std::vector<char> retdata;
 	CURL* curl = curl_easy_init();
 	curl_slist* header = 0;
-	for (const auto& s : netease::headers) {
-		header = curl_slist_append(header, s.c_str());
+	for (int i = 0; i < netease::headers_count; ++i) {
+		header = curl_slist_append(header, (string(netease::headerKeys[i]) + ": " + netease::headerValues[i]).c_str());
 	}
 	header = curl_slist_append(header, ("User-Agent: " + randomUserAgent()).c_str());
 	curl_easy_setopt(curl, CURLOPT_POST, 1);
@@ -139,8 +139,8 @@ int main(int argc, char* argv[]) {
 					std::cout << version << std::endl;
 					return 0;
 				case 'h':
-					for (const auto& s : netease::headers) {
-						std::cout << s << '\n';
+					for (int i = 0; i < netease::headers_count; ++i) {
+						std::cout << netease::headerKeys[i] << ": " << netease::headerValues[i] << '\n';
 					}
 					std::cout << "User-Agent: " << randomUserAgent() << '\n';
 					return 0;
