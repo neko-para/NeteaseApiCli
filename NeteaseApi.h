@@ -79,6 +79,7 @@ namespace netease {
 	Action login_cellphone(long long phone, const string& pswd);
 	Action music_url(long long id, int bitrate = 999000);
 	Action personal_fm();
+	Action playlist_detail(long long id, int recent_collect = 8);
 	Action dailytask(DailyTaskType type = DTT_WEB);
 	Action search(const string& keyword, SearchType type, int limit = 30, int offset = 0);
 	Action song_detail(long long id);

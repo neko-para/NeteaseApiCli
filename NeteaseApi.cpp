@@ -112,6 +112,13 @@ namespace netease {
 		return Action("/v1/radio/get", build_post(data));
 	}
 
+	Action playlist_detail(long long id, int recent_collect) {
+		rapidjson::Document data;
+		data.SetObject();
+		build(data, "id", id, "n", 100000, "s", recent_collect);
+		return Action("/v3/playlist/detail", build_post(data));
+	}
+
 	Action dailytask(DailyTaskType type) {
 		rapidjson::Document data;
 		data.SetObject();

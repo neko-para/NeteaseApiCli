@@ -36,6 +36,7 @@ command:
 	~ login.cellphone phone(%lld) <password
 	~ music.url id(%lld) [bitrate(%d)=999000]
 	@ personal.fm
+	~ playlist.detail id(%lld)
 	~ search text [type(song, album, artist, playlist, user)=song [limit(%d)=30 [offset(%d)=0]]]
 	~ song.detail id(%lld)
 	~ user.detail id(%lld)
@@ -202,6 +203,13 @@ int main(int argc, char* argv[]) {
 		},
 		"personal.fm", [&]() {
 			std::cout << print(netease::personal_fm());
+		},
+		"playlist.detail", [&]() {
+			int rc = 8;
+			try {
+				rc = atoi(arg(3));
+			} catch (...) {}
+			std::cout << print(netease::playlist_detail(atoll(arg(2)), rc));
 		},
 		"search", [&]() {
 			netease::SearchType st = netease::ST_SONG;
