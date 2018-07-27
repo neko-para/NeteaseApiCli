@@ -10,7 +10,7 @@
 
 bool rawprint = false;
 string icookie = "/tmp/neteaseapicookie", ocookie = "/tmp/neteaseapicookie";
-
+int rtn = 0;
 const char* version = "NeteaseApiCli 1.0.0 libNeteaseApi " NETEASEAPI_VERSION;
 
 const char* help = 
@@ -76,7 +76,9 @@ string download(const Action& action) {
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, action.post.length());
 	curl_easy_setopt(curl, CURLOPT_COOKIEFILE, icookie.c_str());
 	curl_easy_setopt(curl, CURLOPT_COOKIEJAR, ocookie.c_str());
-	curl_easy_perform(curl);
+	if (CURLE_OK != curl_easy_perform(curl)) {
+		rtn = 1;
+	}
 	curl_slist_free_all(header);
 	curl_easy_cleanup(curl);
 	retdata.push_back(0);
